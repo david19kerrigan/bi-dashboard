@@ -156,7 +156,11 @@ CMakeFiles/main.dir/main.cpp.o: /home/david/Documents/finni/cpp/main.cpp \
  /usr/include/boost/config/detail/select_compiler_config.hpp \
  /usr/include/boost/config/compiler/gcc.hpp \
  /usr/include/boost/config/detail/select_stdlib_config.hpp \
- /usr/include/c++/13.2.1/version \
+ /usr/include/pqxx/version /usr/include/pqxx/internal/header-pre.hxx \
+ /usr/include/pqxx/version.hxx /usr/include/pqxx/internal/header-post.hxx \
+ /usr/include/pqxx/internal/cxx-features.hxx \
+ /usr/include/pqxx/config-public-compiler.h \
+ /usr/include/c++/13.2.1/ciso646 \
  /usr/include/boost/config/stdlib/libstdcpp3.hpp /usr/include/unistd.h \
  /usr/include/bits/posix_opt.h /usr/include/bits/environments.h \
  /usr/include/bits/confname.h /usr/include/bits/getopt_posix.h \
@@ -255,13 +259,65 @@ CMakeFiles/main.dir/main.cpp.o: /home/david/Documents/finni/cpp/main.cpp \
  /usr/include/boost/none_t.hpp \
  /usr/include/boost/utility/compare_pointees.hpp \
  /usr/include/c++/13.2.1/functional \
- /usr/include/c++/13.2.1/bits/std_function.h \
- /usr/include/c++/13.2.1/array /usr/include/c++/13.2.1/compare \
+ /usr/include/c++/13.2.1/bits/std_function.h /usr/include/pqxx/array \
+ /usr/include/pqxx/array.hxx /usr/include/c++/13.2.1/algorithm \
  /usr/include/c++/13.2.1/bits/stl_algo.h \
  /usr/include/c++/13.2.1/bits/algorithmfwd.h \
  /usr/include/c++/13.2.1/bits/stl_heap.h \
  /usr/include/c++/13.2.1/bits/uniform_int_dist.h \
  /usr/include/c++/13.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/13.2.1/pstl/glue_algorithm_defs.h \
+ /usr/include/c++/13.2.1/pstl/execution_defs.h \
+ /usr/include/pqxx/connection.hxx /usr/include/c++/13.2.1/ctime \
+ /usr/include/c++/13.2.1/list /usr/include/c++/13.2.1/bits/stl_list.h \
+ /usr/include/c++/13.2.1/bits/allocated_ptr.h \
+ /usr/include/c++/13.2.1/bits/list.tcc /usr/include/c++/13.2.1/map \
+ /usr/include/c++/13.2.1/bits/stl_tree.h \
+ /usr/include/c++/13.2.1/bits/stl_map.h \
+ /usr/include/c++/13.2.1/bits/stl_multimap.h \
+ /usr/include/c++/13.2.1/memory \
+ /usr/include/c++/13.2.1/bits/stl_raw_storage_iter.h \
+ /usr/include/c++/13.2.1/bits/align.h \
+ /usr/include/c++/13.2.1/bits/unique_ptr.h \
+ /usr/include/c++/13.2.1/bits/shared_ptr.h \
+ /usr/include/c++/13.2.1/bits/shared_ptr_base.h \
+ /usr/include/c++/13.2.1/ext/concurrence.h \
+ /usr/include/c++/13.2.1/bits/shared_ptr_atomic.h \
+ /usr/include/c++/13.2.1/bits/atomic_base.h \
+ /usr/include/c++/13.2.1/bits/atomic_lockfree_defines.h \
+ /usr/include/c++/13.2.1/backward/auto_ptr.h \
+ /usr/include/c++/13.2.1/pstl/glue_memory_defs.h \
+ /usr/include/pqxx/errorhandler.hxx /usr/include/pqxx/types.hxx \
+ /usr/include/c++/13.2.1/cstdint /usr/include/c++/13.2.1/iterator \
+ /usr/include/c++/13.2.1/bits/stream_iterator.h \
+ /usr/include/pqxx/except.hxx /usr/include/pqxx/internal/concat.hxx \
+ /usr/include/pqxx/strconv.hxx /usr/include/c++/13.2.1/limits \
+ /usr/include/c++/13.2.1/sstream /usr/include/c++/13.2.1/bits/sstream.tcc \
+ /usr/include/c++/13.2.1/charconv /usr/include/pqxx/util.hxx \
+ /usr/include/pqxx/internal/libpq-forward.hxx /usr/include/pqxx/zview.hxx \
+ /usr/include/pqxx/internal/conversions.hxx \
+ /usr/include/c++/13.2.1/numeric \
+ /usr/include/c++/13.2.1/bits/stl_numeric.h \
+ /usr/include/c++/13.2.1/pstl/glue_numeric_defs.h \
+ /usr/include/c++/13.2.1/optional /usr/include/c++/13.2.1/variant \
+ /usr/include/c++/13.2.1/bits/parse_numbers.h \
+ /usr/include/pqxx/params.hxx \
+ /usr/include/pqxx/internal/statement_parameters.hxx \
+ /usr/include/pqxx/binarystring.hxx /usr/include/pqxx/result.hxx \
+ /usr/include/pqxx/internal/encodings.hxx /usr/include/c++/13.2.1/iomanip \
+ /usr/include/c++/13.2.1/locale \
+ /usr/include/c++/13.2.1/bits/locale_facets_nonio.h \
+ /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/time_members.h \
+ /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/messages_members.h \
+ /usr/include/libintl.h /usr/include/c++/13.2.1/bits/codecvt.h \
+ /usr/include/c++/13.2.1/bits/locale_facets_nonio.tcc \
+ /usr/include/c++/13.2.1/bits/locale_conv.h \
+ /usr/include/c++/13.2.1/bits/quoted_string.h \
+ /usr/include/pqxx/internal/encoding_group.hxx \
+ /usr/include/pqxx/internal/ignore-deprecated-pre.hxx \
+ /usr/include/pqxx/internal/ignore-deprecated-post.hxx \
+ /usr/include/pqxx/separated_list.hxx \
+ /usr/include/pqxx/internal/array-composite.hxx \
  /usr/include/boost/utility/result_of.hpp \
  /usr/include/boost/type_traits/type_identity.hpp \
  /usr/include/boost/utility/detail/result_of_variadic.hpp \
@@ -276,7 +332,7 @@ CMakeFiles/main.dir/main.cpp.o: /home/david/Documents/finni/cpp/main.cpp \
  /usr/include/boost/optional/detail/optional_swap.hpp \
  /usr/local/include/crow/http_parser_merged.h \
  /usr/local/include/crow/common.h /usr/local/include/crow/utility.h \
- /usr/include/c++/13.2.1/cstdint /usr/local/include/crow/settings.h \
+ /usr/local/include/crow/settings.h \
  /usr/lib/gcc/x86_64-pc-linux-gnu/13.2.1/include/limits.h \
  /usr/lib/gcc/x86_64-pc-linux-gnu/13.2.1/include/syslimits.h \
  /usr/include/limits.h /usr/include/bits/posix1_lim.h \
@@ -284,8 +340,6 @@ CMakeFiles/main.dir/main.cpp.o: /home/david/Documents/finni/cpp/main.cpp \
  /usr/include/bits/posix2_lim.h /usr/include/bits/xopen_lim.h \
  /usr/include/bits/uio_lim.h /usr/local/include/crow/ci_map.h \
  /usr/include/boost/algorithm/string/predicate.hpp \
- /usr/include/c++/13.2.1/iterator \
- /usr/include/c++/13.2.1/bits/stream_iterator.h \
  /usr/include/boost/algorithm/string/config.hpp \
  /usr/include/boost/range/begin.hpp /usr/include/boost/range/config.hpp \
  /usr/include/boost/range/iterator.hpp \
@@ -501,11 +555,7 @@ CMakeFiles/main.dir/main.cpp.o: /home/david/Documents/finni/cpp/main.cpp \
  /usr/include/boost/preprocessor/seq/limits/enum_256.hpp \
  /usr/include/boost/concept/detail/concept_undef.hpp \
  /usr/include/boost/iterator/iterator_concepts.hpp \
- /usr/include/boost/limits.hpp /usr/include/c++/13.2.1/limits \
- /usr/include/c++/13.2.1/algorithm \
- /usr/include/c++/13.2.1/pstl/glue_algorithm_defs.h \
- /usr/include/c++/13.2.1/pstl/execution_defs.h \
- /usr/include/boost/range/value_type.hpp \
+ /usr/include/boost/limits.hpp /usr/include/boost/range/value_type.hpp \
  /usr/include/boost/range/detail/misc_concept.hpp \
  /usr/include/boost/type_traits/make_unsigned.hpp \
  /usr/include/boost/type_traits/is_signed.hpp \
@@ -553,14 +603,6 @@ CMakeFiles/main.dir/main.cpp.o: /home/david/Documents/finni/cpp/main.cpp \
  /usr/include/boost/range/iterator_range_io.hpp \
  /usr/include/boost/range/detail/str_types.hpp \
  /usr/include/boost/algorithm/string/compare.hpp \
- /usr/include/c++/13.2.1/locale \
- /usr/include/c++/13.2.1/bits/locale_facets_nonio.h \
- /usr/include/c++/13.2.1/ctime \
- /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/time_members.h \
- /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/messages_members.h \
- /usr/include/libintl.h /usr/include/c++/13.2.1/bits/codecvt.h \
- /usr/include/c++/13.2.1/bits/locale_facets_nonio.tcc \
- /usr/include/c++/13.2.1/bits/locale_conv.h \
  /usr/include/boost/algorithm/string/find.hpp \
  /usr/include/boost/algorithm/string/finder.hpp \
  /usr/include/boost/algorithm/string/constants.hpp \
@@ -632,24 +674,7 @@ CMakeFiles/main.dir/main.cpp.o: /home/david/Documents/finni/cpp/main.cpp \
  /usr/include/c++/13.2.1/tr1/poly_hermite.tcc \
  /usr/include/c++/13.2.1/tr1/poly_laguerre.tcc \
  /usr/include/c++/13.2.1/tr1/riemann_zeta.tcc \
- /usr/include/c++/13.2.1/sstream /usr/include/c++/13.2.1/bits/sstream.tcc \
- /usr/include/c++/13.2.1/memory \
- /usr/include/c++/13.2.1/bits/stl_raw_storage_iter.h \
- /usr/include/c++/13.2.1/bits/align.h \
- /usr/include/c++/13.2.1/bits/unique_ptr.h \
- /usr/include/c++/13.2.1/bits/shared_ptr.h \
- /usr/include/c++/13.2.1/bits/shared_ptr_base.h \
- /usr/include/c++/13.2.1/bits/allocated_ptr.h \
- /usr/include/c++/13.2.1/ext/concurrence.h \
- /usr/include/c++/13.2.1/bits/shared_ptr_atomic.h \
- /usr/include/c++/13.2.1/bits/atomic_base.h \
- /usr/include/c++/13.2.1/bits/atomic_lockfree_defines.h \
- /usr/include/c++/13.2.1/backward/auto_ptr.h \
- /usr/include/c++/13.2.1/pstl/glue_memory_defs.h \
- /usr/include/c++/13.2.1/typeindex /usr/include/c++/13.2.1/optional \
- /usr/include/c++/13.2.1/variant \
- /usr/include/c++/13.2.1/bits/parse_numbers.h \
- /usr/local/include/crow/TinySHA1.hpp \
+ /usr/include/c++/13.2.1/typeindex /usr/local/include/crow/TinySHA1.hpp \
  /usr/local/include/crow/socket_adaptors.h /usr/include/boost/asio.hpp \
  /usr/include/boost/asio/any_completion_executor.hpp \
  /usr/include/boost/asio/detail/config.hpp /usr/include/linux/version.h \
@@ -1470,10 +1495,7 @@ CMakeFiles/main.dir/main.cpp.o: /home/david/Documents/finni/cpp/main.cpp \
  /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/basic_file.h \
  /usr/include/c++/13.2.1/x86_64-pc-linux-gnu/bits/c++io.h \
  /usr/include/c++/13.2.1/bits/fstream.tcc \
- /usr/local/include/crow/task_timer.h /usr/include/c++/13.2.1/map \
- /usr/include/c++/13.2.1/bits/stl_tree.h \
- /usr/include/c++/13.2.1/bits/stl_map.h \
- /usr/include/c++/13.2.1/bits/stl_multimap.h \
+ /usr/local/include/crow/task_timer.h \
  /usr/local/include/crow/http_request.h \
  /usr/local/include/crow/websocket.h /usr/local/include/crow/TinySHA1.hpp \
  /usr/local/include/crow/parser.h /usr/include/boost/algorithm/string.hpp \
@@ -1482,8 +1504,6 @@ CMakeFiles/main.dir/main.cpp.o: /home/david/Documents/finni/cpp/main.cpp \
  /usr/include/boost/algorithm/string/yes_no_type.hpp \
  /usr/include/boost/algorithm/string/sequence_traits.hpp \
  /usr/include/boost/algorithm/string/std/list_traits.hpp \
- /usr/include/c++/13.2.1/list /usr/include/c++/13.2.1/bits/stl_list.h \
- /usr/include/c++/13.2.1/bits/list.tcc \
  /usr/include/boost/algorithm/string/std/slist_traits.hpp \
  /usr/include/c++/13.2.1/ext/slist \
  /usr/include/boost/algorithm/string/trim.hpp \
@@ -1569,8 +1589,6 @@ CMakeFiles/main.dir/main.cpp.o: /home/david/Documents/finni/cpp/main.cpp \
  /usr/include/boost/date_time/iso_format.hpp \
  /usr/include/boost/date_time/parse_format_base.hpp \
  /usr/include/boost/io/ios_state.hpp /usr/include/boost/io_fwd.hpp \
- /usr/include/c++/13.2.1/iomanip \
- /usr/include/c++/13.2.1/bits/quoted_string.h \
  /usr/include/boost/date_time/date_format_simple.hpp \
  /usr/include/boost/date_time/gregorian/gregorian_io.hpp \
  /usr/include/boost/date_time/date_facet.hpp \
@@ -1602,29 +1620,6 @@ CMakeFiles/main.dir/main.cpp.o: /home/david/Documents/finni/cpp/main.cpp \
  /usr/local/include/crow/version.h /usr/local/include/crow/app.h \
  /usr/include/c++/13.2.1/thread \
  /usr/include/c++/13.2.1/bits/this_thread_sleep.h /usr/include/pqxx/pqxx \
- /usr/include/pqxx/internal/header-pre.hxx \
- /usr/include/pqxx/internal/cxx-features.hxx \
- /usr/include/pqxx/config-public-compiler.h \
- /usr/include/c++/13.2.1/ciso646 /usr/include/pqxx/array.hxx \
- /usr/include/pqxx/connection.hxx /usr/include/pqxx/errorhandler.hxx \
- /usr/include/pqxx/types.hxx /usr/include/pqxx/except.hxx \
- /usr/include/pqxx/internal/concat.hxx /usr/include/pqxx/strconv.hxx \
- /usr/include/c++/13.2.1/charconv /usr/include/pqxx/util.hxx \
- /usr/include/pqxx/version.hxx \
- /usr/include/pqxx/internal/libpq-forward.hxx /usr/include/pqxx/zview.hxx \
- /usr/include/pqxx/internal/conversions.hxx \
- /usr/include/c++/13.2.1/numeric \
- /usr/include/c++/13.2.1/bits/stl_numeric.h \
- /usr/include/c++/13.2.1/pstl/glue_numeric_defs.h \
- /usr/include/pqxx/params.hxx \
- /usr/include/pqxx/internal/statement_parameters.hxx \
- /usr/include/pqxx/binarystring.hxx /usr/include/pqxx/result.hxx \
- /usr/include/pqxx/internal/encodings.hxx \
- /usr/include/pqxx/internal/encoding_group.hxx \
- /usr/include/pqxx/internal/ignore-deprecated-pre.hxx \
- /usr/include/pqxx/internal/ignore-deprecated-post.hxx \
- /usr/include/pqxx/separated_list.hxx \
- /usr/include/pqxx/internal/array-composite.hxx \
  /usr/include/pqxx/blob.hxx /usr/include/c++/13.2.1/filesystem \
  /usr/include/c++/13.2.1/bits/fs_fwd.h \
  /usr/include/c++/13.2.1/bits/fs_path.h /usr/include/c++/13.2.1/codecvt \
@@ -1650,5 +1645,4 @@ CMakeFiles/main.dir/main.cpp.o: /home/david/Documents/finni/cpp/main.cpp \
  /usr/include/pqxx/robusttransaction.hxx \
  /usr/include/pqxx/stream_from.hxx /usr/include/pqxx/stream_to.hxx \
  /usr/include/pqxx/subtransaction.hxx /usr/include/pqxx/time.hxx \
- /usr/include/pqxx/transactor.hxx \
- /usr/include/pqxx/internal/header-post.hxx
+ /usr/include/pqxx/transactor.hxx

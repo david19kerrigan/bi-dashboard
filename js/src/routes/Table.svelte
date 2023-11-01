@@ -1,17 +1,21 @@
-<script lang="js">
+<script lang="ts">
 	import { writable } from "svelte/store";
 	import { onMount } from "svelte";
-	export let data = [{ ID: "", Name: "", Status: "", Address: "", Custom: "" }];
+	let data = [
+		{ ID: "", Name: "", Status: "", Address: "", Custom: "" },
+	];
+	console.log("here2");
 	onMount(async () => {
-	  fetch("localhost:1080/getData")
-	  .then(response => response.json())
-	  .then(pgData => {
-			console.log(data);
-			data += pgData;
-	  }).catch(error => {
-		console.log(error);
-		return [];
-	  });
+		fetch("http://localhost:8080/getData")
+			.then((response) => response.json())
+			.then((pgData) => {
+				console.log(pgData);
+				data = pgData["data"];
+			})
+			.catch((error) => {
+				console.log(error);
+				return [];
+			});
 	});
 </script>
 
@@ -30,9 +34,16 @@
 			</tr>
 		{/each}
 		<tr>
-			{#each Object.values(data[0]) as column}
-				<td><input type="text" name="fname" /></td>
-			{/each}
+			<td><input type="text" name="id" /></td>
+			<td><input type="text" name="name" /></td>
+			<td><input type="text" name="status" /></td>
+			<td><input type="text" name="address" /></td>
 		</tr>
 	</table>
+</div>
+
+<div>
+	<button type="submit">
+		Submit Changes
+	</button>
 </div>

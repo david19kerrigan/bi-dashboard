@@ -1,7 +1,6 @@
 <script>
 	import Counter from './Counter.svelte';
 	import Table from './Table.svelte';
-	import Submit from './Submit.svelte';
 	import welcome from '$lib/images/svelte-welcome.webp';
 	import welcome_fallback from '$lib/images/svelte-welcome.png';
 </script>
@@ -24,8 +23,6 @@
 	</h1>
 
 	<Table />
-
-	<Submit />
 
 	<h2>
 		try editing <strong>src/routes/+page.svelte</strong>
