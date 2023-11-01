@@ -1,5 +1,0 @@
-cmake_minimum_required(VERSION 3.15)
-project(finni)
-add_executable(main main.cpp)
-include_directories(/usr/include/pqxx)
-include_directories(/usr/local/include)
