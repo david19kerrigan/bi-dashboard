@@ -1,0 +1,3 @@
+/home/david/Documents/finni/cpp/CMakeFiles/main.dir
+/home/david/Documents/finni/cpp/CMakeFiles/edit_cache.dir
+/home/david/Documents/finni/cpp/CMakeFiles/rebuild_cache.dir
