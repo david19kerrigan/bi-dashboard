@@ -18,17 +18,10 @@
 				<img src={welcome_fallback} alt="Welcome" />
 			</picture>
 		</span>
-
-		to your new<br />SvelteKit app
 	</h1>
 
 	<Table />
 
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
 </section>
 
 <style>

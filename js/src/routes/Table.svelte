@@ -1,69 +1,126 @@
 <script lang="ts">
 	import { writable } from "svelte/store";
 	import { onMount } from "svelte";
-	let data = [{ ID: "", Name: "", Status: "", Address: "", Custom: "" }];
-	onMount(async () => {
+	let columns: Array<string> = ["ID", "Name", "Status", "Address"];
+	export let tableData: Array<object> = [];
+
+	onMount(() => getData());
+	async function getData() {
 		fetch("http://localhost:8080/getData")
 			.then((response) => response.json())
 			.then((pgData) => {
-				data = pgData["data"];
+				tableData = pgData["data"];
 			})
 			.catch((error) => {
-				console.log(error);
 				return [];
 			});
-	});
-	const handleSubmit = (e) => {
-		// getting the action url
-		const ACTION_URL = "http://localhost:8080/postData";
-
-		// get the form fields data and convert it to URLSearchParams
-		const formData = new FormData(e.target);
-		const data = new URLSearchParams();
-		let list = {};
-		for (let field of formData) {
-			const [key, value] = field;
-			data.append(key, value);
-			console.log(key, value);
-		}
-		data.append("test", "value");
-		console.log(data);
-
+	}
+	async function postData(data: object, ACTION_URL: string) {
 		fetch(ACTION_URL, {
 			method: "POST",
-			body: JSON.stringify({id: "test", name: "test", status: "test", address: "test"}),
+			body: JSON.stringify(data),
 		});
+		window.location.reload();
+		//let test = structuredClone(tableData);
+		//test.push(data);
+		//$: tableData = test;
+	}
+	async function deleteRow(rowNum: number, ACTION_URL: string) {
+		fetch(ACTION_URL, {
+			method: "POST",
+			body: JSON.stringify({ rowNum: rowNum }),
+		});
+		window.location.reload();
+		//let test = structuredClone(tableData);
+		//test.push(data);
+		//$: tableData = test;
+	}
+
+	let count: number = -1;
+	function getNumber(): string {
+		count++;
+		let answer = "delete" + String(count);
+		return answer;
+	}
+
+	let addRows: number = 1;
+	function addRowNumber(): number {
+		addRows++;
+		return addRows;
+	}
+
+	const handleSubmit = (e: Event) => {
+		if (e["submitter"]["id"] == "subChanges") {
+			const ACTION_URL = "http://localhost:8080/postData";
+			const formData = new FormData(e.target);
+			let data1: object = { rows: [] };
+			let temp: object = {};
+			let currentId: number = 0;
+			for (let field of formData) {
+				const [key, value] = field;
+
+				if (key == "id") {
+					currentId = Number(value);
+					temp[currentId] = {};
+				}
+				temp[currentId][key] = value;
+			}
+			for (let row of Object.values(temp)) {
+				data1["rows"].push(row);
+			}
+			postData(data1, ACTION_URL);
+		}
+		if (e["submitter"]["id"].slice(0, 6) == "delete") {
+			const rowNum = e["submitter"]["id"].slice(6);
+			const rowId = tableData[rowNum]["id"];
+			deleteRow(rowId, "http://localhost:8080/deleteRow");
+		}
+		if (e["submitter"]["id"] == "addRow") {
+			addRowNumber();
+		}
 	};
 </script>
 
-<div class="counter">
-	<form on:submit={handleSubmit}>
+<div>
+	<form on:submit|preventDefault={handleSubmit}>
 		<table>
 			<tr>
-				{#each Object.keys(data[0]) as column}
-					<th>{column}</th>
+				{#each columns as columnNames, index}
+					<th>{columnNames}</th>
 				{/each}
 			</tr>
-			{#each Object.values(data) as row}
+			{#if tableData}
+				{#each tableData as row, index}
+					<tr>
+						{#each Object.values(row) as column}
+							<td
+								><input
+									id="delete"
+									type="text"
+									value={column}
+								/></td
+							>
+						{/each}
+						<input
+							id={getNumber()}
+							type="submit"
+							value="Delete Row"
+						/>
+					</tr>
+				{/each}
+			{/if}
+			{#each Array(addRows) as _, i}
 				<tr>
-					{#each Object.values(row) as column}
-						<td>{column}</td>
-					{/each}
+					<td><input type="text" name="id" /></td>
+					<td><input type="text" name="name" /></td>
+					<td><input type="text" name="status" /></td>
+					<td><input type="text" name="address" /></td>
 				</tr>
 			{/each}
-			<tr>
-				<td>
-					<input type="text" name="id" />
-				</td>
-				<td><input type="text" name="name" /></td>
-				<td><input type="text" name="status" /></td>
-				<td><input type="text" name="address" /></td>
-			</tr>
 		</table>
-		<input type="submit" value="Submit Changes" />
+		<input id="addRow" type="submit" value="Add Row" />
+		<br />
+		<br />
+		<input id="subChanges" type="submit" value="Submit Changes" />
 	</form>
-</div>
-
-<div>
-	<button type="submit"> Submit Changes </button>
 </div>

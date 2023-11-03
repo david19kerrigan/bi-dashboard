@@ -1,10 +1,11 @@
 package main
 
 import (
+	//"io"
 	"database/sql"
 	"fmt"
-	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -12,10 +13,18 @@ import (
 )
 
 type Patient struct {
-	id      string `json:"id"`
-	name    string `json:"name"`
-	status  string `json:"status"`
-	address string `json:"address"`
+	Id      string `json:"id"`
+	Name    string `json:"name"`
+	Status  string `json:"status"`
+	Address string `json:"address"`
+}
+
+type Row struct {
+	RowNum string `json:"rowNum"`
+}
+
+type Rows struct {
+	Rows []Patient `json:"rows"`
 }
 
 func main() {
@@ -28,11 +37,12 @@ func main() {
 	})
 
 	r.POST("/postData", postData)
+	r.POST("/deleteRow", deleteRow)
 
 	r.GET("/getData", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"data": getData()})
 	})
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	r.Run()
 }
 
 const (
@@ -49,29 +59,54 @@ func setupDB() *sql.DB {
 	return db
 }
 
-func postData(c *gin.Context) {
-	var patient Patient
-	err := c.BindJSON(&patient)
+func deleteRow(c *gin.Context) {
+	var row Row
+	err := c.BindJSON(&row)
 	if err != nil {
 		fmt.Println("error", err)
 	}
-	fmt.Println("Patient ", patient.name)
+	db := setupDB()
+	defer db.Close()
+	fmt.Println("DB pointer ", db)
+	query := "DELETE FROM finni.patients WHERE id = $1"
+	conv, _ := strconv.Atoi(row.RowNum)
+	fmt.Println(conv)
+	rows, err := db.Exec(query, conv)
+	if err != nil {
+		fmt.Println("error ", err)
+	}
+	fmt.Println("rows ", rows)
+}
+func postData(c *gin.Context) {
+	//body, _ := io.ReadAll(c.Request.Body)
+	//println(string(body))
 
-	body, _ := ioutil.ReadAll(c.Request.Body)
-    fmt.Println(string(body))
+	var row Rows
+	err := c.BindJSON(&row)
+
+	if err != nil {
+		fmt.Println("error", err)
+	}
+	fmt.Printf("Patient %+v \n", row)
 
 	db := setupDB()
+	defer db.Close()
 	fmt.Println("DB pointer ", db)
-	query := fmt.Sprintf("INSERT INTO finni.patients (id, name, status, address) VALUES (&s, &s, &s, &s);", patient.id, patient.name, patient.status, patient.address)
-	fmt.Println("Query ", query)
-	//rows, err := db.Query(query)
-	//if err != nil {
-	//	fmt.Println("error", err)
-	//}
+
+	for _, patient := range row.Rows {
+		query := "INSERT INTO finni.patients (id, name, status, address) VALUES ($1, $2, $3, $4);"
+		fmt.Println("%v", patient)
+		_, err := db.Exec(query, patient.Id, patient.Name, patient.Status, patient.Address)
+		if err != nil {
+			fmt.Println("error ", err)
+		}
+	}
+
 }
 
 func getData() *[]Patient {
 	db := setupDB()
+	defer db.Close()
 	fmt.Println("DB pointer ", db)
 	rows, err := db.Query("SELECT * FROM finni.patients")
 	if err != nil {
@@ -80,7 +115,7 @@ func getData() *[]Patient {
 	var result []Patient
 	for rows.Next() {
 		var p Patient
-		err = rows.Scan(&p.id, &p.name, &p.status, &p.address)
+		err = rows.Scan(&p.Id, &p.Name, &p.Status, &p.Address)
 		if err != nil {
 			fmt.Println("error ", err)
 		}
