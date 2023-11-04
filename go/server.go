@@ -30,19 +30,14 @@ type Rows struct {
 func main() {
 	r := gin.Default()
 	r.Use(cors.Default())
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
 
 	r.POST("/postData", postData)
 	r.POST("/updateData", updateData)
 	r.POST("/deleteRow", deleteRow)
-
 	r.GET("/getData", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"data": getData()})
 	})
+
 	r.Run()
 }
 
@@ -98,7 +93,8 @@ func deleteRow(c *gin.Context) {
 	fmt.Println("DB pointer ", db)
 	query := "DELETE FROM finni.patients WHERE id = $1"
 	conv, _ := strconv.Atoi(row.RowNum)
-	fmt.Println(conv)
+	fmt.Println("Rownum ", conv)
+
 	rows, err := db.Exec(query, conv)
 	if err != nil {
 		fmt.Println("error ", err)
