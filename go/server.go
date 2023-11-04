@@ -37,6 +37,7 @@ func main() {
 	})
 
 	r.POST("/postData", postData)
+	r.POST("/updateData", updateData)
 	r.POST("/deleteRow", deleteRow)
 
 	r.GET("/getData", func(c *gin.Context) {
@@ -57,6 +58,33 @@ func setupDB() *sql.DB {
 		fmt.Println("error", err)
 	}
 	return db
+}
+
+func updateData(c *gin.Context) {
+	//body, _ := io.ReadAll(c.Request.Body)
+	//println(string(body))
+
+	var row Rows
+	err := c.BindJSON(&row)
+
+	if err != nil {
+		fmt.Println("error", err)
+	}
+	fmt.Printf("Patient %+v \n", row)
+
+	db := setupDB()
+	defer db.Close()
+	fmt.Println("DB pointer ", db)
+
+	for _, patient := range row.Rows {
+		query := "UPDATE finni.patients SET id = $1, name = $2, status = $3, address = $4 WHERE id = $5"
+		fmt.Println("%v", patient)
+		_, err := db.Exec(query, patient.Id, patient.Name, patient.Status, patient.Address, patient.Id)
+		if err != nil {
+			fmt.Println("error ", err)
+		}
+	}
+
 }
 
 func deleteRow(c *gin.Context) {
