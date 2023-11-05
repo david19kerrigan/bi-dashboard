@@ -1,5 +1,5 @@
 # TODO
-1. Form validation -> hot reloading comes with it
+1. hot reloading
 2. Modifying the schema
 3. Multiple addresses
 4. CSS overhaul

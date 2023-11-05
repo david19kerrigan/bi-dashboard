@@ -4,53 +4,121 @@
 
 	const HOSTNAME = "http://localhost:8080";
 	const URL_GET_DATA = `${HOSTNAME}/getData`;
-	const URL_POST_DATA = `${HOSTNAME}/postData`;
+	const URL_NEW_DATA = `${HOSTNAME}/newData`;
 	const URL_UPDATE_DATA = `${HOSTNAME}/updateData`;
 	const URL_DELETE_DATA = `${HOSTNAME}/deleteRow`;
 
 	interface filter {
 		col: number;
-		type: number;
+		type: string;
 		cont: string;
 		operation: string;
 	}
 
-	interface topLevelInterface<T> {
-		[row: string]: T;
+	interface topLevelInterface {
+		[row: string]: dataInterface;
 	}
 
 	interface postDataInterface {
-		rows: Array<dataInterface>
+		rows: Array<dataInterface>;
 	}
 
 	interface dataInterface {
-		[key: string]: string;
+		[key: string]: string | number;
 	}
 
-	let filterTypes: Array<string> = [
-		"equals",
-		"contains",
-		"less than",
-		"greater than",
+	enum StatusValues {
+		active = "Active",
+		churned = "Churned",
+		inquiry = "Inquiry",
+		onboarding = "Onboarding",
+	}
+
+	enum Json {
+		rows = "rows",
+		data = "data",
+	}
+
+	enum Validation {
+		name = "[A-Za-z\\s]+",
+		address = "[A-Za-z0-9'\\.\\-\\s,]+",
+	}
+
+	enum DataColumns {
+		id = "id",
+		name = "name",
+		status = "status",
+		address = "address",
+	}
+
+	enum FilterColumns {
+		col = "col",
+		type = "type",
+		cont = "cont",
+		operation = "operation",
+	}
+
+	enum FilterState {
+		OR = "OR",
+		AND = "AND",
+	}
+
+	enum FilterTypes {
+		equals = "equals",
+		contains = "contains",
+		less_than = "less than",
+		greater_than = "greater than",
+	}
+
+	const filterTypes: Array<string> = [
+		FilterTypes.equals,
+		FilterTypes.contains,
+		FilterTypes.less_than,
+		FilterTypes.greater_than,
 	];
 
-	export let tableData: topLevelInterface<dataInterface> = {};
-	export let filters: Array<filter> = [
-		{ col: 0, type: 0, cont: "", operation: "" },
+	const columns: Array<string> = [
+		DataColumns.id,
+		DataColumns.name,
+		DataColumns.status,
+		DataColumns.address,
 	];
-	export let displayedData: topLevelInterface<dataInterface> = {};
-	export let columns: Array<string> = ["id", "name", "status", "address"];
+
+	const filterColumns: Array<string> = [
+		FilterColumns.col,
+		FilterColumns.type,
+		FilterColumns.cont,
+		FilterColumns.operation,
+	];
+
+	const statusValues: Array<string> = [
+		StatusValues.active,
+		StatusValues.churned,
+		StatusValues.inquiry,
+		StatusValues.onboarding,
+	];
+
+	const emptyFilter = {
+		col: 0,
+		type: FilterTypes.equals,
+		cont: "",
+		operation: FilterState.OR,
+	};
+
+	export let tableData: topLevelInterface = {};
+	export let filters: Array<filter> = [structuredClone(emptyFilter)];
+	export let displayedData: topLevelInterface = {};
 
 	let count: number = -1;
-	let addRows: number = 1;
+	let addRows: number = 0;
 
 	onMount(() => getData());
 
 	function toggleOperation(id: number): void {
-		if (filters[id]["operation"] == "OR") {
-			filters[id]["operation"] = "AND";
+		if (filters[id][FilterColumns.operation] === FilterState.OR) {
+			filters[id][FilterColumns.operation] = FilterState.AND;
 		} else {
-			filters[id]["operation"] = "OR";
+			filters[id][FilterColumns.operation] = FilterState.OR;
 		}
 		filterData();
 	}
@@ -68,48 +136,76 @@
 
 	function updateFilterCol(e: Event, id: number): void {
 		let text: number = Number((e.target as HTMLButtonElement).value);
-		filters[id]["col"] = text;
+		filters[id][FilterColumns.col] = text;
 		filterData();
 	}
 
 	function updateFilterType(e: Event, id: number): void {
-		let text: number = Number((e.target as HTMLButtonElement).value);
-		filters[id]["type"] = text;
+		let text: string = String((e.target as HTMLButtonElement).value);
+		filters[id][FilterColumns.type] = text;
 		filterData();
 	}
 
 	function updateFilterCont(e: Event, id: number): void {
 		let text: string = (e.target as HTMLButtonElement).value;
-		filters[id]["cont"] = text;
+		filters[id][FilterColumns.cont] = text;
 		filterData();
 	}
 
 	function filterData(): void {
-		displayedData = {};
+		displayedData = {}; // Start with no data
 		let filtersUsed: boolean = false;
+
 		for (var i = 0; i < filters.length; i++) {
 			let filter: filter = filters[i];
-			if (filter["cont"] == "") {
+
+			if (filter[FilterColumns.cont] === "") {
+				// if there's no input ignore the filter
 				continue;
 			} else {
 				filtersUsed = true;
-				if (filter["operation"] == "AND") {
+
+				if (filter[FilterColumns.operation] === FilterState.AND) {
+					// for AND filtering -> filter displayedData
 					for (const key of Object.keys(displayedData)) {
-						const column = columns[filter["col"]];
-						if (filter["type"] == 1) {
+						const column = columns[filter[FilterColumns.col]];
+						if (
+							filter[FilterColumns.type] ===
+							FilterTypes.greater_than
+						) {
+							if (
+								displayedData[key][column] >
+								filter[FilterColumns.cont]
+							) {
+								delete displayedData[key];
+							}
+						}
+						if (
+							filter[FilterColumns.type] === FilterTypes.less_than
+						) {
+							if (
+								displayedData[key][column] <
+								filter[FilterColumns.cont]
+							) {
+								delete displayedData[key];
+							}
+						}
+						if (
+							filter[FilterColumns.type] === FilterTypes.contains
+						) {
 							if (
 								!(displayedData[key][column] as String).match(
-									filter["cont"]
+									filter[FilterColumns.cont]
 								)
 							) {
 								delete displayedData[key];
 							}
 						}
-						if (filter["type"] == 0) {
+						if (filter[FilterColumns.type] === FilterTypes.equals) {
 							if (
 								!(
 									(tableData[key][column] as String) ==
-									filter["cont"]
+									filter[FilterColumns.cont]
 								)
 							) {
 								delete displayedData[key];
@@ -117,22 +213,49 @@
 						}
 					}
 				}
-				if (filter["operation"] == "OR" || i == 0) {
+				if (
+					filter[FilterColumns.operation] === FilterState.OR ||
+					i === 0
+				) {
+					// for OR filtering -> filter tableData and combine the result with displayedData
 					for (const key of Object.keys(tableData)) {
-						const column = columns[filter["col"]];
-						if (filter["type"] == 1) {
+						const column = columns[filter[FilterColumns.col]];
+						if (
+							filter[FilterColumns.type] ===
+							FilterTypes.greater_than
+						) {
+							if (
+								tableData[key][column] >
+								filter[FilterColumns.cont]
+							) {
+								displayedData[key] = tableData[key];
+							}
+						}
+						if (
+							filter[FilterColumns.type] === FilterTypes.less_than
+						) {
+							if (
+								tableData[key][column] <
+								filter[FilterColumns.cont]
+							) {
+								displayedData[key] = tableData[key];
+							}
+						}
+						if (
+							filter[FilterColumns.type] === FilterTypes.contains
+						) {
 							if (
 								(tableData[key][column] as String).match(
-									filter["cont"]
+									filter[FilterColumns.cont]
 								)
 							) {
 								displayedData[key] = tableData[key];
 							}
 						}
-						if (filter["type"] == 0) {
+						if (filter[FilterColumns.type] === FilterTypes.equals) {
 							if (
 								(tableData[key][column] as String) ==
-								filter["cont"]
+								filter[FilterColumns.cont]
 							) {
 								displayedData[key] = tableData[key];
 							}
@@ -142,16 +265,17 @@
 			}
 		}
 		if (!filtersUsed) {
+			// If no filters were applied use tableData
 			displayedData = structuredClone(tableData);
 		}
 	}
 
 	function addFilter(): void {
-		let temp = structuredClone(filters);
-		temp.push({ col: 0, type: 0, cont: "", operation: "OR" });
-		$: filters = temp;
+		filters.push(emptyFilter);
+		$: filters = filters;
 	}
 
+	// For checking if two rows of data are the same
 	function isEqual(one: dataInterface, two: dataInterface): boolean {
 		let answer: boolean = true;
 		let key1: Array<string> = Object.keys(one);
@@ -175,9 +299,11 @@
 		fetch(URL_GET_DATA)
 			.then((response) => response.json())
 			.then((pgData) => {
-				for (const row of pgData["data"]) {
-					tableData[row["id"]] = row;
-					displayedData[row["id"]] = row;
+				tableData = {};
+				displayedData = {};
+				for (const row of pgData[Json.data]) {
+					tableData[row[DataColumns.id]] = row;
+					displayedData[row[DataColumns.id]] = row;
 				}
 			})
 			.catch((error) => {
@@ -186,14 +312,17 @@
 	}
 
 	async function basicPost(data: object, ACTION_URL: string): Promise<void> {
-		fetch(ACTION_URL, {
+		await fetch(ACTION_URL, {
 			method: "POST",
 			body: JSON.stringify(data),
-		});
-		window.location.reload();
-		//let test = structuredClone(tableData);
-		//test.push(data);
-		//$: tableData = test;
+		})
+			.then(() => {
+				getData();
+			})
+			.then(() => {
+				$: tableData = tableData;
+				$: displayedData = tableData;
+			});
 	}
 
 	function addRowNumber(): number {
@@ -211,47 +340,69 @@
 		basicPost({ rowNum: actualId }, URL_DELETE_DATA);
 	}
 
-	function subChanges(e: Event) {
+	function validateData(type: string, value: string): boolean {
+		if (type === DataColumns.name) {
+			return /^([A-Za-z\s]+)$/.test(value);
+		}
+		if (type === DataColumns.address) {
+			const regex = new RegExp(Validation.name);
+			return /^([A-Za-z0-9'.-\s,]+)$/.test(value);
+		}
+		return true;
+	}
+
+	function subChanges(e: Event): void {
 		const formData = new FormData((e.target as HTMLFormElement).form);
-		let data1: postDataInterface = { rows: [] };
-		let data2: topLevelInterface<dataInterface> = {};
-		let data3: postDataInterface = { rows: [] };
-		let temp: topLevelInterface<dataInterface> = {};
-		let currentId: number = -1;
+
+		let newDataPost: postDataInterface = { rows: [] };
+		let newDataArray: Array<dataInterface> = [];
+
+		let updatedDataArray: Array<dataInterface> = [];
+		let updateDataPost: postDataInterface = { rows: [] };
+
+		let unpackedData: Array<dataInterface> = [];
+		let currentRowData: dataInterface = {};
+
 		for (let field of formData) {
+			// iterate thru all input fields of the table
 			const [key, value] = field;
-			if (key == "id") {
-				if (value == "") {
-					currentId = -1;
-				} else {
-					currentId = Number(value);
-				}
-				if (currentId != -1) {
-					temp[currentId] = {};
-				}
+			if (!validateData(key, String(value))) {
+				return;
 			}
-			if (currentId != -1) {
-				temp[currentId][key] = String(value);
+			if (Object.keys(currentRowData).includes(key)) {
+				unpackedData.push(currentRowData);
+				currentRowData = {};
 			}
+			currentRowData[key] = String(value);
 		}
-		for (let id of Object.keys(temp)) {
-			if (!Object.keys(tableData).includes(id)) {
-				data1["rows"].push(temp[id]);
-			} else {
-				data2[id] = temp[id];
-			}
-		}
-		if (Object.keys(data1).length > 0) {
-			basicPost(data1, URL_POST_DATA);
+		unpackedData.push(currentRowData);
+
+		newDataArray = unpackedData.slice(
+			Object.keys(tableData).length,
+			unpackedData.length
+		);
+		updatedDataArray = unpackedData.slice(0, Object.keys(tableData).length);
+
+		if (newDataArray.length > 0) {
+			// Evalute input fields that have new data
+			newDataPost[Json.rows] = newDataArray;
+			basicPost(newDataPost, URL_NEW_DATA);
 		}
 
-		for (let id of Object.keys(data2)) {
-			let reference: object = tableData[id];
-			if (!isEqual(reference, data2[id])) {
-				data3["rows"].push(data2[id]);
+		for (var i = 0; i < updatedDataArray.length; i++) {
+			const id = Object.keys(tableData)[i];
+			// Evalute input fields that have updated data
+			let reference: dataInterface = tableData[id];
+			let currentRow = updatedDataArray[i];
+			delete reference[DataColumns.id];
+			if (!isEqual(reference, currentRow)) {
+				currentRow[DataColumns.id] = id;
+				updateDataPost[Json.rows].push(currentRow);
 			}
 		}
-		basicPost(data3, URL_UPDATE_DATA);
+		basicPost(updateDataPost, URL_UPDATE_DATA);
+
+		addRows = 0;
 	}
 </script>
 
@@ -266,16 +417,15 @@
 			/>
 		{/if}
 		<br />
-		<select name="colName" on:change={(e) => updateFilterCol(e, rowI)}>
+		<select on:change={(e) => updateFilterCol(e, rowI)}>
 			{#each columns as name, colI}
 				<option value={colI}>{name}</option>
 			{/each}
 		</select>
 		<select on:change={(e) => updateFilterType(e, rowI)} name="filterType">
-			<option value="0">equals</option>
-			<option value="1">contains</option>
-			<option value="2">less than</option>
-			<option value="3">greater than</option>
+			{#each filterTypes as type, typeI}
+				<option value={type}>{type}</option>
+			{/each}
 		</select>
 		<input
 			on:change={(e) => updateFilterCont(e, rowI)}
@@ -301,7 +451,7 @@
 			<tr>
 				{#each columns as columnNames, index}
 					<th>
-						<input type="submit" value={columnNames + " ⬆"} />
+						<input type="submit" value={columnNames} />
 					</th>
 				{/each}
 			</tr>
@@ -309,28 +459,82 @@
 				{#each Object.values(displayedData) as row, rowI}
 					<tr>
 						{#each Object.values(row) as column, colI}
-							<td
-								><input
-									name={columns[colI]}
-									type="text"
-									value={column}
-								/></td
-							>
+							<td>
+								{#if columns[colI] === DataColumns.id}
+									{column}
+								{:else if columns[colI] === DataColumns.address}
+									<input
+										name={columns[colI]}
+										type="text"
+										value={column}
+										class="field"
+										pattern={Validation.address}
+									/>
+								{:else if columns[colI] === DataColumns.name}
+									<input
+										name={columns[colI]}
+										type="text"
+										value={column}
+										class="field"
+										pattern={Validation.name}
+									/>
+								{:else if columns[colI] === DataColumns.status}
+									<select name={columns[colI]}>
+										{#each statusValues as status, statusI}
+											<option value={status}
+												>{status}</option
+											>
+										{/each}
+									</select>
+								{:else}
+									<input
+										name={columns[colI]}
+										type="text"
+										value={column}
+									/>
+								{/if}
+							</td>
 						{/each}
 						<input
 							type="submit"
 							value="Delete Row"
 							on:click={() => deleteRow(rowI)}
 						/>
-					</tr>
-				{/each}
+					</tr>{/each}
 			{/if}
 			{#each Array(addRows) as _, i}
 				<tr>
-					<td><input type="text" name="id" /></td>
-					<td><input type="text" name="name" /></td>
-					<td><input type="text" name="status" /></td>
-					<td><input type="text" name="address" /></td>
+					{#each columns as col, j}
+						<td>
+							{#if columns[j] === DataColumns.id}{:else if columns[j] === DataColumns.status}
+								<select name={columns[j]}>
+									{#each statusValues as status, statusI}
+										<option value={status}>{status}</option>
+									{/each}
+								</select>
+							{:else if columns[j] === DataColumns.address}
+								<input
+									type="text"
+									value=""
+									name={columns[j]}
+									class="field"
+									pattern={Validation.address}
+									required
+								/>
+							{:else if columns[j] === DataColumns.name}
+								<input
+									type="text"
+									name={columns[j]}
+									value=""
+									class="field"
+									pattern={Validation.name}
+									required
+								/>
+							{:else}
+								<input type="text" name={col} />
+							{/if}
+						</td>
+					{/each}
 					<input
 						type="submit"
 						value="Delete Row"
@@ -340,6 +544,7 @@
 			{/each}
 		</table>
 		<input type="submit" value="Add Row" on:click={addRowNumber} />
+		<input type="submit" value="Add Column" on:click={addRowNumber} />
 		<br />
 		<br />
 		<input
