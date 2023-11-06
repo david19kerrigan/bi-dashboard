@@ -441,7 +441,7 @@
 
 <div>
 	<table>
-		<tr><th> Filters </th></tr>
+		<tr><th colspan="5"> Filters </th></tr>
 		{#each filters as filter, rowI}
 			<tr>
 				<td>
@@ -516,6 +516,7 @@
 						class="field"
 					/>
 				{/if}
+				<th />
 			</tr>
 			{#if tableData}
 				{#each Object.values(displayedData) as row, rowI}
@@ -531,6 +532,7 @@
 										value={row[column]}
 										class="field"
 										pattern={Validation.address}
+										required
 									/>
 								{:else if columns[colI] === DataColumns.name}
 									<input
@@ -539,6 +541,7 @@
 										value={row[column]}
 										class="field"
 										pattern={Validation.name}
+										required
 									/>
 								{:else if columns[colI] === DataColumns.status}
 									<select
@@ -619,11 +622,13 @@
 							<input name={column} type="text" value="" />
 						</td>
 					{/each}
-					<input
-						type="submit"
-						value="Delete Row"
-						on:click={delRowNumber}
-					/>
+					<td>
+						<input
+							type="submit"
+							value="Delete Row"
+							on:click={delRowNumber}
+						/>
+					</td>
 				</tr>
 			{/each}
 		</table>
