@@ -163,7 +163,8 @@
 
 		for (var i = 0; i < filters.length; i++) {
 			let filter: filter = filters[i];
-			const combinedColumns: Array<string> = columns.concat(customColumns);
+			const combinedColumns: Array<string> =
+				columns.concat(customColumns);
 
 			if (filter[FilterColumns.cont] === "") {
 				// if there's no input ignore the filter
@@ -174,7 +175,8 @@
 				if (filter[FilterColumns.operation] === FilterState.AND) {
 					// for AND filtering -> filter displayedData
 					for (const key of Object.keys(displayedData)) {
-						const column = combinedColumns[filter[FilterColumns.col]];
+						const column =
+							combinedColumns[filter[FilterColumns.col]];
 						if (
 							filter[FilterColumns.type] ===
 							FilterTypes.greater_than
@@ -225,7 +227,8 @@
 				) {
 					// for OR filtering -> filter tableData and combine the result with displayedData
 					for (const key of Object.keys(tableData)) {
-						const column = combinedColumns[filter[FilterColumns.col]];
+						const column =
+							combinedColumns[filter[FilterColumns.col]];
 						if (
 							filter[FilterColumns.type] ===
 							FilterTypes.greater_than
@@ -437,59 +440,72 @@
 </script>
 
 <div>
-	<h1>Filters</h1>
-	{#each filters as filter, rowI}
-		{#if rowI > 0}
-			<input
-				on:click={() => toggleOperation(rowI)}
-				type="submit"
-				value={filters[rowI]["operation"]}
-			/>
-		{/if}
-		<br />
-		<select on:change={(e) => updateFilterCol(e, rowI)}>
-			{#each columns as name, colI}
-				<option value={colI}>{name}</option>
-			{/each}
-			{#each customColumns as name, colI}
-				<option value={columns.length + colI}>{name}</option>
-			{/each}
-		</select>
-		<select on:change={(e) => updateFilterType(e, rowI)} name="filterType">
-			{#each filterTypes as type, typeI}
-				<option value={type}>{type}</option>
-			{/each}
-		</select>
-		<input
-			on:change={(e) => updateFilterCont(e, rowI)}
-			type="text"
-			value=""
-		/>
-		<input
-			type="submit"
-			value="Remove Filter"
-			on:click={() => removeFilter(rowI)}
-		/>
-		<br />
-	{/each}
+	<table>
+		<tr><th> Filters </th></tr>
+		{#each filters as filter, rowI}
+			<tr>
+				<td>
+					{#if rowI > 0}
+						<input
+							on:click={() => toggleOperation(rowI)}
+							type="submit"
+							value={filters[rowI]["operation"]}
+						/>
+					{/if}
+				</td>
+				<td>
+					<select on:change={(e) => updateFilterCol(e, rowI)}>
+						{#each columns as name, colI}
+							<option value={colI}>{name}</option>
+						{/each}
+						{#each customColumns as name, colI}
+							<option value={columns.length + colI}>{name}</option
+							>
+						{/each}
+					</select>
+				</td>
+				<td>
+					<select
+						on:change={(e) => updateFilterType(e, rowI)}
+						name="filterType"
+					>
+						{#each filterTypes as type, typeI}
+							<option value={type}>{type}</option>
+						{/each}
+					</select>
+				</td>
+				<td>
+					<input
+						on:change={(e) => updateFilterCont(e, rowI)}
+						type="text"
+						value=""
+					/>
+				</td>
+				<td>
+					<input
+						type="submit"
+						value="Remove Filter"
+						on:click={() => removeFilter(rowI)}
+					/>
+				</td>
+			</tr>
+		{/each}
+	</table>
 
 	<input type="submit" value="Add Filter" on:click={addFilter} />
 </div>
-<br />
-<br />
-
 <div>
 	<form>
 		<table>
 			<tr>
 				{#each columns as columnNames, index}
 					<th>
-						<input type="submit" value={columnNames} />
+						{columnNames}
 					</th>
 				{/each}
 				{#each customColumns as columnNames, index}
 					<th>
-						<input type="submit" value={columnNames} />
+						{columnNames}
 					</th>
 				{/each}
 				{#if newColumns > 0}
@@ -613,8 +629,6 @@
 		</table>
 		<input type="submit" value="Add Row" on:click={addRowNumber} />
 		<input type="submit" value="Add Column" on:click={addNewColumn} />
-		<br />
-		<br />
 		<input
 			type="submit"
 			value="Submit Changes"
