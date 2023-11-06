@@ -12,11 +12,17 @@ import (
 	_ "github.com/lib/pq"
 )
 
+var DataColumns = []string{"id", "name", "status", "address"}
+
 type Patient struct {
 	Id      string `json:"id"`
 	Name    string `json:"name"`
 	Status  string `json:"status"`
 	Address string `json:"address"`
+}
+
+type Column struct {
+	ColumnName string `json:"columnName"`
 }
 
 type Row struct {
@@ -34,6 +40,7 @@ func main() {
 	r.POST("/newData", newData)
 	r.POST("/updateData", updateData)
 	r.POST("/deleteRow", deleteRow)
+	r.POST("/addColumn", addColumn)
 	r.GET("/getData", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"data": getData()})
 	})
@@ -55,25 +62,38 @@ func setupDB() *sql.DB {
 	return db
 }
 
-func updateData(c *gin.Context) {
-	//body, _ := io.ReadAll(c.Request.Body)
-	//println(string(body))
+func addColumn(c *gin.Context) {
+	var column Column
+	err := c.BindJSON(&column)
 
+	if err != nil {
+		fmt.Println("error: ", err)
+	}
+
+	db := setupDB()
+	defer db.Close()
+
+	query := "ALTER TABLE finni.custom ADD COLUMN $1 VARCHAR DEFAULT ''"
+	_, err = db.Exec(query, column.ColumnName)
+
+	if err != nil {
+		fmt.Println("error: ", err)
+	}
+}
+
+func updateData(c *gin.Context) {
 	var row Rows
 	err := c.BindJSON(&row)
 
 	if err != nil {
 		fmt.Println("error: ", err)
 	}
-	fmt.Printf("Patient:  %+v \n", row)
 
 	db := setupDB()
 	defer db.Close()
-	fmt.Println("DB pointer: ", db)
 
 	for _, patient := range row.Rows {
-		query := "UPDATE finni.patients SET id = $1, name = $2, status = $3, address = $4 WHERE id = $5"
-		fmt.Println("Patient: %v", patient)
+		query := "UPDATE finni.patients SET id = $1, name = $2, status = $3, address = $4 WHERE id = $5;"
 		_, err := db.Exec(query, patient.Id, patient.Name, patient.Status, patient.Address, patient.Id)
 		if err != nil {
 			fmt.Println("error: ", err)
@@ -94,7 +114,6 @@ func deleteRow(c *gin.Context) {
 	fmt.Println("DB pointer: ", db)
 	query := "DELETE FROM finni.patients WHERE id = $1"
 	conv, _ := strconv.Atoi(row.RowNum)
-	fmt.Println("Rownum: ", conv)
 
 	rows, err := db.Exec(query, conv)
 	if err != nil {
@@ -102,25 +121,20 @@ func deleteRow(c *gin.Context) {
 	}
 	fmt.Println("rows: ", rows)
 }
-func newData(c *gin.Context) {
-	//body, _ := io.ReadAll(c.Request.Body)
-	//println(string(body))
 
+func newData(c *gin.Context) {
 	var row Rows
 	err := c.BindJSON(&row)
 
 	if err != nil {
 		fmt.Println("error: ", err)
 	}
-	fmt.Printf("Patient: %+v \n", row)
 
 	db := setupDB()
 	defer db.Close()
-	fmt.Println("DB pointer: ", db)
 
 	for _, patient := range row.Rows {
 		query := "INSERT INTO finni.patients (id, name, status, address) VALUES (DEFAULT, $1, $2, $3);"
-		fmt.Println("Patient: %v", patient)
 		_, err := db.Exec(query, patient.Name, patient.Status, patient.Address)
 		if err != nil {
 			fmt.Println("error: ", err)
@@ -129,24 +143,39 @@ func newData(c *gin.Context) {
 
 }
 
-func getData() *[]Patient {
+func getData() *[]map[string]interface{} {
 	db := setupDB()
 	defer db.Close()
 
-	fmt.Println("DB pointer: ", db)
 	rows, err := db.Query("SELECT * FROM finni.patients")
 	if err != nil {
 		fmt.Println("error: ", err)
 	}
-	var result []Patient
+
+	var columns []string
+	columns, err = rows.Columns()
+	lenColumns := len(columns)
+	allRows := make([]map[string]interface{}, 0)
+
 	for rows.Next() {
-		var p Patient
-		err = rows.Scan(&p.Id, &p.Name, &p.Status, &p.Address)
+		colassoc := make(map[string]interface{}, lenColumns)
+		cols := make([]interface{}, lenColumns)
+
+		fmt.Println("columns: ", columns)
+
+		for i := 0; i < lenColumns; i++ {
+			cols[i] = new(interface{})
+		}
+
+		err = rows.Scan(cols...)
+		for i, col := range columns {
+			colassoc[col] = *cols[i].(*interface{})
+		}
+		allRows = append(allRows, colassoc)
+
 		if err != nil {
 			fmt.Println("error: ", err)
 		}
-		result = append(result, p)
-		fmt.Println("results: ", result)
 	}
-	return &result
+	return &allRows
 }

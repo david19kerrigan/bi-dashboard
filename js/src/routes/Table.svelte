@@ -7,6 +7,8 @@
 	const URL_NEW_DATA = `${HOSTNAME}/newData`;
 	const URL_UPDATE_DATA = `${HOSTNAME}/updateData`;
 	const URL_DELETE_DATA = `${HOSTNAME}/deleteRow`;
+	const URL_NEW_COLUMN = `${HOSTNAME}/addColumn`;
+	const NEW_COLUMN = "newColumn";
 
 	interface filter {
 		col: number;
@@ -111,6 +113,9 @@
 
 	let count: number = -1;
 	let addRows: number = 0;
+	let newColumns: number = 0;
+
+	let customColumns: Array<string> = [];
 
 	onMount(() => getData());
 
@@ -270,6 +275,10 @@
 		}
 	}
 
+	function addNewColumn(): void {
+		newColumns++;
+	}
+
 	function addFilter(): void {
 		filters.push(emptyFilter);
 		$: filters = filters;
@@ -305,6 +314,17 @@
 					tableData[row[DataColumns.id]] = row;
 					displayedData[row[DataColumns.id]] = row;
 				}
+				if (
+					pgData[Json.data] &&
+					Object.keys(pgData[Json.data][0]).length > columns.length
+				) {
+					for (const column of Object.keys(pgData[Json.data][0])) {
+						if (!columns.includes(column)) {
+							customColumns.push(column);
+						}
+					}
+					$: customColumns = customColumns;
+				}
 			})
 			.catch((error) => {
 				return [];
@@ -325,14 +345,12 @@
 			});
 	}
 
-	function addRowNumber(): number {
+	function addRowNumber(): void {
 		addRows++;
-		return addRows;
 	}
 
-	function delRowNumber(): number {
+	function delRowNumber(): void {
 		addRows--;
-		return addRows;
 	}
 
 	function deleteRow(rowId: number): void {
@@ -351,6 +369,10 @@
 		return true;
 	}
 
+	function updateSchema(value: string): void {
+		basicPost({ columnName: value }, URL_NEW_COLUMN);
+	}
+
 	function subChanges(e: Event): void {
 		const formData = new FormData((e.target as HTMLFormElement).form);
 
@@ -366,6 +388,9 @@
 		for (let field of formData) {
 			// iterate thru all input fields of the table
 			const [key, value] = field;
+			if (key === NEW_COLUMN && newColumns > 0) {
+				updateSchema(String(value));
+			}
 			if (!validateData(key, String(value))) {
 				return;
 			}
@@ -421,6 +446,9 @@
 			{#each columns as name, colI}
 				<option value={colI}>{name}</option>
 			{/each}
+			{#each customColumns as name, colI}
+				<option value={colI}>{name}</option>
+			{/each}
 		</select>
 		<select on:change={(e) => updateFilterType(e, rowI)} name="filterType">
 			{#each filterTypes as type, typeI}
@@ -454,19 +482,32 @@
 						<input type="submit" value={columnNames} />
 					</th>
 				{/each}
+				{#each customColumns as columnNames, index}
+					<th>
+						<input type="submit" value={columnNames} />
+					</th>
+				{/each}
+				{#if newColumns > 0}
+					<input
+						name={NEW_COLUMN}
+						type="text"
+						value=""
+						class="field"
+					/>
+				{/if}
 			</tr>
 			{#if tableData}
 				{#each Object.values(displayedData) as row, rowI}
 					<tr>
-						{#each Object.values(row) as column, colI}
+						{#each columns as column, colI}
 							<td>
 								{#if columns[colI] === DataColumns.id}
-									{column}
+									{row[column]}
 								{:else if columns[colI] === DataColumns.address}
 									<input
 										name={columns[colI]}
 										type="text"
-										value={column}
+										value={row[column]}
 										class="field"
 										pattern={Validation.address}
 									/>
@@ -474,12 +515,15 @@
 									<input
 										name={columns[colI]}
 										type="text"
-										value={column}
+										value={row[column]}
 										class="field"
 										pattern={Validation.name}
 									/>
 								{:else if columns[colI] === DataColumns.status}
-									<select name={columns[colI]}>
+									<select
+										name={columns[colI]}
+										value={row[column]}
+									>
 										{#each statusValues as status, statusI}
 											<option value={status}
 												>{status}</option
@@ -490,16 +534,30 @@
 									<input
 										name={columns[colI]}
 										type="text"
-										value={column}
+										value={row[column]}
 									/>
 								{/if}
 							</td>
 						{/each}
-						<input
-							type="submit"
-							value="Delete Row"
-							on:click={() => deleteRow(rowI)}
-						/>
+						{#each customColumns as column, colI}
+							<td>
+								<input
+									name={columns[colI]}
+									type="text"
+									value={row[column]}
+								/>
+							</td>
+						{/each}
+						{#if newColumns > 0}
+							<td />
+						{/if}
+						<td>
+							<input
+								type="submit"
+								value="Delete Row"
+								on:click={() => deleteRow(rowI)}
+							/>
+						</td>
 					</tr>{/each}
 			{/if}
 			{#each Array(addRows) as _, i}
@@ -535,6 +593,11 @@
 							{/if}
 						</td>
 					{/each}
+					{#each customColumns as column, colI}
+						<td>
+							<input name={columns[colI]} type="text" value="" />
+						</td>
+					{/each}
 					<input
 						type="submit"
 						value="Delete Row"
@@ -544,7 +607,7 @@
 			{/each}
 		</table>
 		<input type="submit" value="Add Row" on:click={addRowNumber} />
-		<input type="submit" value="Add Column" on:click={addRowNumber} />
+		<input type="submit" value="Add Column" on:click={addNewColumn} />
 		<br />
 		<br />
 		<input
