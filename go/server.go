@@ -73,8 +73,9 @@ func addColumn(c *gin.Context) {
 	db := setupDB()
 	defer db.Close()
 
-	query := "ALTER TABLE finni.custom ADD COLUMN $1 VARCHAR DEFAULT ''"
-	_, err = db.Exec(query, column.ColumnName)
+	query := "ALTER TABLE finni.patients ADD COLUMN " + column.ColumnName + " VARCHAR DEFAULT '';"
+	fmt.Println(query)
+	_, err = db.Exec(query)
 
 	if err != nil {
 		fmt.Println("error: ", err)
@@ -82,24 +83,31 @@ func addColumn(c *gin.Context) {
 }
 
 func updateData(c *gin.Context) {
-	var row Rows
-	err := c.BindJSON(&row)
-
-	if err != nil {
-		fmt.Println("error: ", err)
-	}
+	var data map[string]interface{}
 
 	db := setupDB()
 	defer db.Close()
 
-	for _, patient := range row.Rows {
-		query := "UPDATE finni.patients SET id = $1, name = $2, status = $3, address = $4 WHERE id = $5;"
-		_, err := db.Exec(query, patient.Id, patient.Name, patient.Status, patient.Address, patient.Id)
+	err := c.BindJSON(&data)
+	if err != nil {
+		fmt.Println("error: ", err)
+	}
+
+	for i := range data["rows"].([]interface{}) {
+		thisRow := data["rows"].([]interface{})[i]
+		fmt.Printf("THIS ROW: %v\n", thisRow)
+		query := "UPDATE finni.patients SET "
+		for j := range thisRow.(map[string]interface{}) {
+			query += " " + j + " = '" + thisRow.(map[string]interface{})[j].(string) + "',"
+		}
+		query = query[:len(query)-1]
+		query += " WHERE id = " + thisRow.(map[string]interface{})["id"].(string)
+		fmt.Printf("QUERY: %s\n", query)
+		_, err := db.Exec(query)
 		if err != nil {
 			fmt.Println("error: ", err)
 		}
 	}
-
 }
 
 func deleteRow(c *gin.Context) {
@@ -123,24 +131,36 @@ func deleteRow(c *gin.Context) {
 }
 
 func newData(c *gin.Context) {
-	var row Rows
-	err := c.BindJSON(&row)
-
-	if err != nil {
-		fmt.Println("error: ", err)
-	}
+	var data map[string]interface{}
 
 	db := setupDB()
 	defer db.Close()
 
-	for _, patient := range row.Rows {
-		query := "INSERT INTO finni.patients (id, name, status, address) VALUES (DEFAULT, $1, $2, $3);"
-		_, err := db.Exec(query, patient.Name, patient.Status, patient.Address)
+	err := c.BindJSON(&data)
+	if err != nil {
+		fmt.Println("error: ", err)
+	}
+
+	for i := range data["rows"].([]interface{}) {
+		thisRow := data["rows"].([]interface{})[i]
+		fmt.Printf("THIS ROW: %v\n", thisRow)
+		query := "INSERT INTO finni.patients (id, "
+		for j := range thisRow.(map[string]interface{}) {
+			query += j + ","
+		}
+		query = query[:len(query)-1]
+		query += ") VALUES (DEFAULT, "
+		for j := range thisRow.(map[string]interface{}) {
+			query += "'" + thisRow.(map[string]interface{})[j].(string) + "'" + ","
+		}
+		query = query[:len(query)-1]
+		query += ")"
+
+		_, err := db.Exec(query)
 		if err != nil {
 			fmt.Println("error: ", err)
 		}
 	}
-
 }
 
 func getData() *[]map[string]interface{} {
@@ -160,8 +180,6 @@ func getData() *[]map[string]interface{} {
 	for rows.Next() {
 		colassoc := make(map[string]interface{}, lenColumns)
 		cols := make([]interface{}, lenColumns)
-
-		fmt.Println("columns: ", columns)
 
 		for i := 0; i < lenColumns; i++ {
 			cols[i] = new(interface{})

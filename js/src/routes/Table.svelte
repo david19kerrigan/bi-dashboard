@@ -163,6 +163,7 @@
 
 		for (var i = 0; i < filters.length; i++) {
 			let filter: filter = filters[i];
+			const combinedColumns: Array<string> = columns.concat(customColumns);
 
 			if (filter[FilterColumns.cont] === "") {
 				// if there's no input ignore the filter
@@ -173,7 +174,7 @@
 				if (filter[FilterColumns.operation] === FilterState.AND) {
 					// for AND filtering -> filter displayedData
 					for (const key of Object.keys(displayedData)) {
-						const column = columns[filter[FilterColumns.col]];
+						const column = combinedColumns[filter[FilterColumns.col]];
 						if (
 							filter[FilterColumns.type] ===
 							FilterTypes.greater_than
@@ -224,7 +225,7 @@
 				) {
 					// for OR filtering -> filter tableData and combine the result with displayedData
 					for (const key of Object.keys(tableData)) {
-						const column = columns[filter[FilterColumns.col]];
+						const column = combinedColumns[filter[FilterColumns.col]];
 						if (
 							filter[FilterColumns.type] ===
 							FilterTypes.greater_than
@@ -319,7 +320,10 @@
 					Object.keys(pgData[Json.data][0]).length > columns.length
 				) {
 					for (const column of Object.keys(pgData[Json.data][0])) {
-						if (!columns.includes(column)) {
+						if (
+							!columns.includes(column) &&
+							!customColumns.includes(column)
+						) {
 							customColumns.push(column);
 						}
 					}
@@ -371,6 +375,7 @@
 
 	function updateSchema(value: string): void {
 		basicPost({ columnName: value }, URL_NEW_COLUMN);
+		newColumns--;
 	}
 
 	function subChanges(e: Event): void {
@@ -447,7 +452,7 @@
 				<option value={colI}>{name}</option>
 			{/each}
 			{#each customColumns as name, colI}
-				<option value={colI}>{name}</option>
+				<option value={columns.length + colI}>{name}</option>
 			{/each}
 		</select>
 		<select on:change={(e) => updateFilterType(e, rowI)} name="filterType">
@@ -542,7 +547,7 @@
 						{#each customColumns as column, colI}
 							<td>
 								<input
-									name={columns[colI]}
+									name={column}
 									type="text"
 									value={row[column]}
 								/>
@@ -595,7 +600,7 @@
 					{/each}
 					{#each customColumns as column, colI}
 						<td>
-							<input name={columns[colI]} type="text" value="" />
+							<input name={column} type="text" value="" />
 						</td>
 					{/each}
 					<input
