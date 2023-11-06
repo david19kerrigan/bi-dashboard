@@ -376,6 +376,11 @@
 		return true;
 	}
 
+	function addAddress(e: Event, rowNum: number): void {
+		const id: string = Object.keys(displayedData)[rowNum];
+		displayedData[id][DataColumns.address] += ",";
+	}
+
 	function updateSchema(value: string): void {
 		basicPost({ columnName: value }, URL_NEW_COLUMN);
 		newColumns--;
@@ -402,12 +407,25 @@
 			if (!validateData(key, String(value))) {
 				return;
 			}
-			if (Object.keys(currentRowData).includes(key)) {
+			if (
+				Object.keys(currentRowData).includes(key) &&
+				key != DataColumns.address
+			) {
 				unpackedData.push(currentRowData);
 				currentRowData = {};
 			}
-			currentRowData[key] = String(value);
+			if (key === DataColumns.address) {
+				if (currentRowData[key]) {
+					currentRowData[key] += "," + String(value);
+				} else {
+					currentRowData[key] = String(value);
+				}
+			} else {
+				currentRowData[key] = String(value);
+			}
+			console.log(currentRowData);
 		}
+		console.log(currentRowData);
 		unpackedData.push(currentRowData);
 
 		newDataArray = unpackedData.slice(
@@ -522,19 +540,31 @@
 				{#each Object.values(displayedData) as row, rowI}
 					<tr>
 						{#each columns as column, colI}
-							<td>
-								{#if columns[colI] === DataColumns.id}
+							{#if columns[colI] === DataColumns.id}
+								<td>
 									{row[column]}
-								{:else if columns[colI] === DataColumns.address}
+								</td>
+							{:else if columns[colI] === DataColumns.address}
+								<td class="block">
+									{#each String(row[column]).split(",") as address, addressI}
+										<input
+											name={columns[colI]}
+											type="text"
+											value={address}
+											class="field"
+											pattern={Validation.address}
+											required
+										/>
+									{/each}
 									<input
-										name={columns[colI]}
-										type="text"
-										value={row[column]}
+										type="submit"
+										value="+"
 										class="field"
-										pattern={Validation.address}
-										required
+										on:click={(e) => addAddress(e, rowI)}
 									/>
-								{:else if columns[colI] === DataColumns.name}
+								</td>
+							{:else if columns[colI] === DataColumns.name}
+								<td>
 									<input
 										name={columns[colI]}
 										type="text"
@@ -543,7 +573,9 @@
 										pattern={Validation.name}
 										required
 									/>
-								{:else if columns[colI] === DataColumns.status}
+								</td>
+							{:else if columns[colI] === DataColumns.status}
+								<td>
 									<select
 										name={columns[colI]}
 										value={row[column]}
@@ -554,14 +586,16 @@
 											>
 										{/each}
 									</select>
-								{:else}
+								</td>
+							{:else}
+								<td>
 									<input
 										name={columns[colI]}
 										type="text"
 										value={row[column]}
 									/>
-								{/if}
-							</td>
+								</td>
+							{/if}
 						{/each}
 						{#each customColumns as column, colI}
 							<td>

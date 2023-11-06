@@ -121,7 +121,10 @@ table input,
 table select {
     padding: 7px 11px;
 	text-align: center;
+}
 
+.block {
+	display: grid;
 }
 
 table tbody,
