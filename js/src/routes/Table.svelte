@@ -44,7 +44,7 @@
 
 	enum Validation {
 		name = "[A-Za-z]+ [A-Za-z]+ [A-Za-z]+",
-		address = "[A-Za-z0-9'\\.\\-\\s,]+",
+		address = "[A-Za-z0-9'\\.\\-\\s]+",
 	}
 
 	enum DataColumns {
@@ -380,7 +380,7 @@
 		}
 		if (type === DataColumns.address) {
 			const regex = new RegExp(Validation.name);
-			return /^([A-Za-z0-9'.-\s,]+)$/.test(value);
+			return /^([A-Za-z0-9'.-\s]+)$/.test(value);
 		}
 		return true;
 	}
