@@ -42,7 +42,7 @@
 	}
 
 	enum Validation {
-		name = "[A-Za-z\\s]+",
+		name = "[A-Za-z]+ [A-Za-z]+ [A-Za-z]+",
 		address = "[A-Za-z0-9'\\.\\-\\s,]+",
 	}
 
@@ -367,7 +367,7 @@
 
 	function validateData(type: string, value: string): boolean {
 		if (type === DataColumns.name) {
-			return /^([A-Za-z\s]+)$/.test(value);
+			return /^([A-Za-z]+ [A-Za-z]+ [A-Za-z]+)$/.test(value);
 		}
 		if (type === DataColumns.address) {
 			const regex = new RegExp(Validation.name);
