@@ -8,6 +8,7 @@
 	const URL_UPDATE_DATA = `${HOSTNAME}/updateData`;
 	const URL_DELETE_DATA = `${HOSTNAME}/deleteRow`;
 	const URL_NEW_COLUMN = `${HOSTNAME}/addColumn`;
+	const URL_DELETE_COLUMN = `${HOSTNAME}/deleteColumn`;
 	const NEW_COLUMN = "newColumn";
 
 	interface filter {
@@ -314,6 +315,7 @@
 			.then((pgData) => {
 				tableData = {};
 				displayedData = {};
+				customColumns = [];
 				for (const row of pgData[Json.data]) {
 					tableData[row[DataColumns.id]] = row;
 					displayedData[row[DataColumns.id]] = row;
@@ -358,6 +360,13 @@
 
 	function delRowNumber(): void {
 		addRows--;
+	}
+
+	function removeColumn(index: number): void {
+		basicPost(
+			{ columnName: String(customColumns[index]) },
+			URL_DELETE_COLUMN
+		);
 	}
 
 	function deleteRow(rowId: number): void {
@@ -423,9 +432,7 @@
 			} else {
 				currentRowData[key] = String(value);
 			}
-			console.log(currentRowData);
 		}
-		console.log(currentRowData);
 		unpackedData.push(currentRowData);
 
 		newDataArray = unpackedData.slice(
@@ -437,6 +444,7 @@
 		if (newDataArray.length > 0) {
 			// Evalute input fields that have new data
 			newDataPost[Json.rows] = newDataArray;
+			console.log(newDataPost)
 			basicPost(newDataPost, URL_NEW_DATA);
 		}
 
@@ -524,16 +532,24 @@
 				{#each customColumns as columnNames, index}
 					<th>
 						{columnNames}
+						<input
+							type="submit"
+							value="-"
+							on:click={(e) => removeColumn(Number(index))}
+						/>
 					</th>
 				{/each}
-				{#if newColumns > 0}
-					<input
-						name={NEW_COLUMN}
-						type="text"
-						value=""
-						class="field"
-					/>
-				{/if}
+				{#each Array(newColumns) as _, i}
+					<th>
+						<input
+							name={NEW_COLUMN}
+							type="text"
+							value=""
+							class="field"
+						/>
+					</th>
+				{/each}
+				<th />
 				<th />
 			</tr>
 			{#if tableData}
@@ -606,9 +622,9 @@
 								/>
 							</td>
 						{/each}
-						{#if newColumns > 0}
+						{#each Array(newColumns) as _, i}
 							<td />
-						{/if}
+						{/each}
 						<td>
 							<input
 								type="submit"

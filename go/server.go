@@ -41,6 +41,7 @@ func main() {
 	r.POST("/updateData", updateData)
 	r.POST("/deleteRow", deleteRow)
 	r.POST("/addColumn", addColumn)
+	r.POST("/deleteColumn", deleteColumn)
 	r.GET("/getData", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"data": getData()})
 	})
@@ -62,6 +63,25 @@ func setupDB() *sql.DB {
 	return db
 }
 
+func deleteColumn(c *gin.Context) {
+	var data Column
+	err := c.BindJSON(&data)
+
+	if err != nil {
+		fmt.Println("error: ", err)
+	}
+
+	db := setupDB()
+	defer db.Close()
+
+	query := "ALTER TABLE finni.patients DROP COLUMN \"" + data.ColumnName + "\""
+	_, err = db.Exec(query)
+
+	if err != nil {
+		fmt.Println("error: ", err)
+	}
+}
+
 func addColumn(c *gin.Context) {
 	var column Column
 	err := c.BindJSON(&column)
@@ -73,8 +93,7 @@ func addColumn(c *gin.Context) {
 	db := setupDB()
 	defer db.Close()
 
-	query := "ALTER TABLE finni.patients ADD COLUMN " + column.ColumnName + " VARCHAR DEFAULT '';"
-	fmt.Println(query)
+	query := "ALTER TABLE finni.patients ADD COLUMN \"" + column.ColumnName + "\" VARCHAR DEFAULT '';"
 	_, err = db.Exec(query)
 
 	if err != nil {
@@ -98,7 +117,7 @@ func updateData(c *gin.Context) {
 		fmt.Printf("THIS ROW: %v\n", thisRow)
 		query := "UPDATE finni.patients SET "
 		for j := range thisRow.(map[string]interface{}) {
-			query += " " + j + " = '" + thisRow.(map[string]interface{})[j].(string) + "',"
+			query += " \"" + j + "\" = '" + thisRow.(map[string]interface{})[j].(string) + "',"
 		}
 		query = query[:len(query)-1]
 		query += " WHERE id = " + thisRow.(map[string]interface{})["id"].(string)
@@ -145,17 +164,24 @@ func newData(c *gin.Context) {
 		thisRow := data["rows"].([]interface{})[i]
 		fmt.Printf("THIS ROW: %v\n", thisRow)
 		query := "INSERT INTO finni.patients (id, "
+
+		var order []string
 		for j := range thisRow.(map[string]interface{}) {
-			query += j + ","
+			fmt.Println(j)
+			order = append(order, j)
+			query += "\"" + j + "\"" + ","
 		}
 		query = query[:len(query)-1]
 		query += ") VALUES (DEFAULT, "
-		for j := range thisRow.(map[string]interface{}) {
-			query += "'" + thisRow.(map[string]interface{})[j].(string) + "'" + ","
+		for j := range order {
+			fmt.Println(j)
+			fmt.Printf("%s", thisRow.(map[string]interface{})[order[j]].(string))
+			query += "'" + thisRow.(map[string]interface{})[order[j]].(string) + "'" + ","
 		}
 		query = query[:len(query)-1]
 		query += ")"
 
+		fmt.Printf("query % s\n", query)
 		_, err := db.Exec(query)
 		if err != nil {
 			fmt.Println("error: ", err)
