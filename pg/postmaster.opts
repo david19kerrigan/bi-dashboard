@@ -1,1 +1,1 @@
-/usr/bin/postgres "-D" "/home/david/Documents/bi-dashboard/pg"
+/usr/bin/postgres "-D" "."
