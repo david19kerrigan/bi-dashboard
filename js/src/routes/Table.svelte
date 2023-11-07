@@ -444,7 +444,6 @@
 		if (newDataArray.length > 0) {
 			// Evalute input fields that have new data
 			newDataPost[Json.rows] = newDataArray;
-			console.log(newDataPost)
 			basicPost(newDataPost, URL_NEW_DATA);
 		}
 

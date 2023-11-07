@@ -167,14 +167,12 @@ func newData(c *gin.Context) {
 
 		var order []string
 		for j := range thisRow.(map[string]interface{}) {
-			fmt.Println(j)
 			order = append(order, j)
 			query += "\"" + j + "\"" + ","
 		}
 		query = query[:len(query)-1]
 		query += ") VALUES (DEFAULT, "
 		for j := range order {
-			fmt.Println(j)
 			fmt.Printf("%s", thisRow.(map[string]interface{})[order[j]].(string))
 			query += "'" + thisRow.(map[string]interface{})[order[j]].(string) + "'" + ","
 		}
