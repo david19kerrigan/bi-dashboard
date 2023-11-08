@@ -44,7 +44,7 @@
 
 	enum Validation {
 		name = "[A-Za-z]+ [A-Za-z]+ [A-Za-z]+",
-		address = "[A-Za-z0-9'\\.\\-\\s]+",
+		address = "[0-9]+ [A-Za-z0-9'\\.\\-\\s]+",
 	}
 
 	enum DataColumns {
@@ -285,7 +285,7 @@
 	}
 
 	function addFilter(): void {
-		filters.push(emptyFilter);
+		filters.push(structuredClone(emptyFilter));
 		$: filters = filters;
 	}
 
@@ -380,9 +380,18 @@
 		}
 		if (type === DataColumns.address) {
 			const regex = new RegExp(Validation.name);
-			return /^([A-Za-z0-9'.-\s]+)$/.test(value);
+			return /^([0-9]+ [A-Za-z0-9'.-\s]+)$/.test(value);
 		}
 		return true;
+	}
+
+	function removeAddress(e: Event, rowNum: number): void {
+		const id: string = Object.keys(displayedData)[rowNum];
+		const current: string = String(displayedData[id][DataColumns.address]);
+		const comma: number = current.lastIndexOf(",");
+		if (comma != -1) {
+			displayedData[id][DataColumns.address] = current.slice(0, comma);
+		}
 	}
 
 	function addAddress(e: Event, rowNum: number): void {
@@ -560,7 +569,7 @@
 									{row[column]}
 								</td>
 							{:else if columns[colI] === DataColumns.address}
-								<td class="block">
+								<td>
 									{#each String(row[column]).split(",") as address, addressI}
 										<input
 											name={columns[colI]}
@@ -571,12 +580,22 @@
 											required
 										/>
 									{/each}
-									<input
-										type="submit"
-										value="+"
-										class="field"
-										on:click={(e) => addAddress(e, rowI)}
-									/>
+									<div class="padding-top">
+										<input
+											type="submit"
+											value="-"
+											class="field"
+											on:click={(e) =>
+												removeAddress(e, rowI)}
+										/>
+										<input
+											type="submit"
+											value="+"
+											class="field"
+											on:click={(e) =>
+												addAddress(e, rowI)}
+										/>
+									</div>
 								</td>
 							{:else if columns[colI] === DataColumns.name}
 								<td>

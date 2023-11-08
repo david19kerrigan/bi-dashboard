@@ -123,6 +123,10 @@ table select {
 	text-align: center;
 }
 
+.padding-top {
+	padding-top: 5px
+}
+
 .block {
 	display: grid;
 }
