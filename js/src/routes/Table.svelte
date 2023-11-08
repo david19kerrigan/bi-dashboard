@@ -570,6 +570,15 @@
 								</td>
 							{:else if columns[colI] === DataColumns.address}
 								<td>
+									<div class="padding-bottom">
+										<input
+											type="submit"
+											value="-"
+											class="field"
+											on:click={(e) =>
+												removeAddress(e, rowI)}
+										/>
+									</div>
 									{#each String(row[column]).split(",") as address, addressI}
 										<input
 											name={columns[colI]}
@@ -581,13 +590,6 @@
 										/>
 									{/each}
 									<div class="padding-top">
-										<input
-											type="submit"
-											value="-"
-											class="field"
-											on:click={(e) =>
-												removeAddress(e, rowI)}
-										/>
 										<input
 											type="submit"
 											value="+"
